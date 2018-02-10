@@ -1,43 +1,69 @@
 /* William Myers, CNT 5008, Fall 17 */
+var DATA_SIZE_IN_BYTES = 100; //Integer in the interval [1, 2312]
+var USE_RTS_CTS = true;
+var USE_HIDDEN_NODES = true;
 
-//Parameters that should be given by user:
-const DATA_SIZE_IN_BYTES = 100; //Integer in the interval [1, 2312]
-const USE_RTS_CTS = true;
-const USE_HIDDEN_NODES = true;
+function getVariables() {
 
-const NUM_STATIONS = 4;
-const NUM_SECTORS = 4;
-const NUM_FRAMES = 3;
-const NUM_TESTS = 1000;
-const MAX_TIME = 10000000;
+    DATA_SIZE_IN_BYTES = document.getElementById("dataSizeBox").value;
+    if (document.getElementById("useRtsCtsBox").value == "Yes" || document.getElementById("useRtsCtsBox").value == "yes") {
+        USE_RTS_CTS = true;
+    } else if (document.getElementById("useRtsCtsBox").value == "No" || document.getElementById("useRtsCtsBox").value == "no") {
+        USE_RTS_CTS = false;
+    }
+    else {
+        document.getElementById("useRtsCtsBox").value = "Invalid Input";
 
-const CONTROL_SIZE_IN_BYTES = 34;
-const TRANSFER_RATE_IN_MEGABITS_PER_SECOND = 2500;
+    }
+    if (document.getElementById("useHiddenNodesBox").value == "Yes" || document.getElementById("useHiddenNodesBox").value == "yes") {
+        USE_HIDDEN_NODES = true;
+    } else if (document.getElementById("useHiddenNodesBox").value == "No" || document.getElementById("useHiddenNodesBox").value == "no") {
+        USE_HIDDEN_NODES = false;
+    }
+    else {
+        document.getElementById("useRtsCtsBox").value = "Invalid Input";
+    }
+    updateConstants();
+}
+
+var NUM_STATIONS = 4;
+var NUM_SECTORS = 4;
+var NUM_FRAMES = 3;
+var NUM_TESTS = 1000;
+var MAX_TIME = 10000000;
+
+var CONTROL_SIZE_IN_BYTES = 34;
+var TRANSFER_RATE_IN_MEGABITS_PER_SECOND = 2500;
 
 //Lengths of interframe spaces and slot time
-const DIFS = 34;
-const SIFS = 16;
-const SLOT_TIME = 9;
+var DIFS = 34;
+var SIFS = 16;
+var SLOT_TIME = 9;
 
-const CONTROL_SIZE_IN_BITS = CONTROL_SIZE_IN_BYTES * 8;
-const DATA_SIZE_IN_BITS = (DATA_SIZE_IN_BYTES * 8) + CONTROL_SIZE_IN_BITS;
-const TRANSFER_RATE_IN_BITS_PER_MICROSECOND = TRANSFER_RATE_IN_MEGABITS_PER_SECOND * 1024 / 1000000;
-const RTS_CTS_THRESH = 0;
+var CONTROL_SIZE_IN_BITS = CONTROL_SIZE_IN_BYTES * 8;
+var DATA_SIZE_IN_BITS = (DATA_SIZE_IN_BYTES * 8) + CONTROL_SIZE_IN_BITS;
+var TRANSFER_RATE_IN_BITS_PER_MICROSECOND = TRANSFER_RATE_IN_MEGABITS_PER_SECOND * 1024 / 1000000;
+var RTS_CTS_THRESH = 0;
 
 //Used to identify the access point
-const AP = 0;
-const AP_LOC = -1;
+var AP = 0;
+var AP_LOC = -1;
 
 //Definition of frame IDs and Lengths
-const CONTROL_FRAME_LENGTH = Math.ceil(CONTROL_SIZE_IN_BITS / TRANSFER_RATE_IN_BITS_PER_MICROSECOND);
-const ACK = 0;
-const ACK_LEN = CONTROL_FRAME_LENGTH;
-const DATA = 1;
-const DATA_LEN = Math.ceil(DATA_SIZE_IN_BITS / TRANSFER_RATE_IN_BITS_PER_MICROSECOND);
-const RTS = 2;
-const RTS_LEN = CONTROL_FRAME_LENGTH;
-const CTS = 3;
-const CTS_LEN = CONTROL_FRAME_LENGTH;
+var CONTROL_FRAME_LENGTH = Math.ceil(CONTROL_SIZE_IN_BITS / TRANSFER_RATE_IN_BITS_PER_MICROSECOND);
+var ACK = 0;
+var ACK_LEN = CONTROL_FRAME_LENGTH;
+var DATA = 1;
+var DATA_LEN = Math.ceil(DATA_SIZE_IN_BITS / TRANSFER_RATE_IN_BITS_PER_MICROSECOND);
+var RTS = 2;
+var RTS_LEN = CONTROL_FRAME_LENGTH;
+var CTS = 3;
+var CTS_LEN = CONTROL_FRAME_LENGTH;
+
+function updateConstants() {
+    DATA_SIZE_IN_BITS = (DATA_SIZE_IN_BYTES * 8) + CONTROL_SIZE_IN_BITS;
+    DATA_LEN = Math.ceil(DATA_SIZE_IN_BITS / TRANSFER_RATE_IN_BITS_PER_MICROSECOND);
+}
 
 /* Each frame has a type, a length (determined by the type) */
 class frame {
@@ -62,58 +88,58 @@ class frame {
         this.receiver = receiver;
         this.sender = sender;
         this.option = option;
-		this.id = id;
+        this.id = id;
     }
 
-	//Returns a numerical identifier corresponding to the type of frame
+    //Returns a numerical identifier corresponding to the type of frame
     getType() {
         return this.type;
     }
 
-	//Returns the amount of time (in microseconds) required to transmit the frame
+    //Returns the amount of time (in microseconds) required to transmit the frame
     getLength() {
         return this.length;
     }
 
-	//Returns the NAV for the frame.
+    //Returns the NAV for the frame.
     getNav() {
         return this.nav;
     }
 
-	//Returns the address of the frame's sender
+    //Returns the address of the frame's sender
     getSender() {
         return this.sender;
     }
 
-	//Returns the address of the frame's receiver
+    //Returns the address of the frame's receiver
     getReceiver() {
         return this.receiver;
     }
 
-	//Returns the option field for the frame
+    //Returns the option field for the frame
     getOption() {
         return this.option;
     }
 
-	//Updates the receiver field
+    //Updates the receiver field
     setReceiver(address) {
         this.receiver = address;
     }
 
-	//Updates the sender field
+    //Updates the sender field
     setSender(address) {
         this.sender = address;
     }
 
-	//Updates the option field
+    //Updates the option field
     setOption(address) {
         this.option = address;
     }
-	
-	//Returns the ID of the frame
-	getID() {
-		return this.id;
-	}
+
+    //Returns the ID of the frame
+    getID() {
+        return this.id;
+    }
 
 }
 
@@ -164,11 +190,11 @@ class station {
         this.numCollisions = 0;
         this.isReadyToSend = false;
         this.timeToCollision = null;
-		this.apCache = [];
-		this.isCTS = false;
+        this.apCache = [];
+        this.isCTS = false;
     }
 
-	//Returns the address of the station
+    //Returns the address of the station
     getAddress() {
         return this.address;
     }
@@ -201,12 +227,12 @@ class station {
 
         this.waitTime = DIFS;
         this.backoffTime = null;
-		if(this.outBuffer.getType() == RTS) {
-			this.timeToCollision = this.transmissionTime + SIFS + CTS_LEN + 1;
-		} else if (this.outBuffer.getType() == DATA) {
-			this.timeToCollision = this.transmissionTime + SIFS + ACK_LEN + 1;
-		}
-		this.isReadyToSend = false;
+        if (this.outBuffer.getType() == RTS) {
+            this.timeToCollision = this.transmissionTime + SIFS + CTS_LEN + 1;
+        } else if (this.outBuffer.getType() == DATA) {
+            this.timeToCollision = this.transmissionTime + SIFS + ACK_LEN + 1;
+        }
+        this.isReadyToSend = false;
     }
 
 	/*
@@ -221,79 +247,79 @@ class station {
 	*/
     receiveFrame() {
         this.inBuffer = this.bss.medium.frameBuffer;
-		this.numCollisions = 0;
-		this.timeToCollision = null;
+        this.numCollisions = 0;
+        this.timeToCollision = null;
         if (this.inBuffer.getType() == CTS) {
             this.waitTime = SIFS;
             this.backoffTime = 0;
-			this.timeToCollision = null;
-			this.useRtsCts = false;
-			this.outBuffer = this.frames.pop();
+            this.timeToCollision = null;
+            this.useRtsCts = false;
+            this.outBuffer = this.frames.pop();
         } else if (this.inBuffer.getType() == RTS) {
-			if (this.outBuffer != null && this.outBuffer != undefined && this.outBuffer.getType() == DATA) {
-				if(this.isAccessPoint) {
-					let foundMatch = false;
-					for(var i = 0; i < this.frames.length; i++) {
-						if(this.frames[i].getOption() == this.outBuffer.getSender() && this.frames[i].getID() == this.outBuffer.getID()) {
-							foundMatch = true;
-						}
-						if (!foundMatch) {
-							this.frames.push(this.outBuffer);
-						}
-					}
-				} else {
-					this.frames.push(this.outBuffer);					
-				}
-			}
+            if (this.outBuffer != null && this.outBuffer != undefined && this.outBuffer.getType() == DATA) {
+                if (this.isAccessPoint) {
+                    let foundMatch = false;
+                    for (var i = 0; i < this.frames.length; i++) {
+                        if (this.frames[i].getOption() == this.outBuffer.getSender() && this.frames[i].getID() == this.outBuffer.getID()) {
+                            foundMatch = true;
+                        }
+                        if (!foundMatch) {
+                            this.frames.push(this.outBuffer);
+                        }
+                    }
+                } else {
+                    this.frames.push(this.outBuffer);
+                }
+            }
             this.outBuffer = this.generateFrame(CTS, this.inBuffer.sender, null, null);
             this.waitTime = SIFS;
             this.backoffTime = 0;
-			this.numCollisions = 0;
+            this.numCollisions = 0;
         } else if (this.inBuffer.getType() == DATA) {
-			if (this.outBuffer != null && this.outBuffer != undefined) {
-				if(this.isAccessPoint) {
-					if(this.outBuffer.getType() == ACK) {
-						this.frames.pop();
-					} else if(this.outBuffer.getType() == DATA) {
-						this.frames.push(this.outBuffer);
-					}
-				} else if(this.outBuffer.getType() == DATA){
-					this.frames.push(this.outBuffer);
-				}
-			}
+            if (this.outBuffer != null && this.outBuffer != undefined) {
+                if (this.isAccessPoint) {
+                    if (this.outBuffer.getType() == ACK) {
+                        this.frames.pop();
+                    } else if (this.outBuffer.getType() == DATA) {
+                        this.frames.push(this.outBuffer);
+                    }
+                } else if (this.outBuffer.getType() == DATA) {
+                    this.frames.push(this.outBuffer);
+                }
+            }
             this.outBuffer = this.generateFrame(ACK, this.inBuffer.sender, this.inBuffer.getOption(), this.inBuffer.getID());
             if (this.isAccessPoint) {
                 let tempSender = AP;
                 let tempReceiver = this.inBuffer.getOption();
                 let tempOption = this.inBuffer.getSender();
-				let newDataFrame = this.generateFrame(DATA, tempReceiver, tempOption, this.inBuffer.getID());
-				this.frames.push(newDataFrame);
-				this.timeToCollision = null;
-				
+                let newDataFrame = this.generateFrame(DATA, tempReceiver, tempOption, this.inBuffer.getID());
+                this.frames.push(newDataFrame);
+                this.timeToCollision = null;
+
             }
             this.waitTime = SIFS;
             this.backoffTime = 0;
-			this.numCollisions = 0;
+            this.numCollisions = 0;
         } else if (this.inBuffer.getType() == ACK) {
-			if(this.isAccessPoint) {
-				this.apCache.push([this.inBuffer.getOption(), this.inBuffer.getID()]);
-			}
+            if (this.isAccessPoint) {
+                this.apCache.push([this.inBuffer.getOption(), this.inBuffer.getID()]);
+            }
             this.outBuffer = null;
             this.numCollisions = 0;
             this.waitTime = DIFS;
             this.backoffTime = null;
-			this.timeToCollision = null;
+            this.timeToCollision = null;
         }
         this.nav = null;
         this.inBuffer = null;
     }
 
-	// "Listens" to the medium for signals. If there is at least one signal in the station's sector, this will return false.
+    // "Listens" to the medium for signals. If there is at least one signal in the station's sector, this will return false.
     listen(medium) {
         return medium.isQuiet(this.physicalLocation);
     }
 
-	// Generates a frame of a specified type, destined for a receiver, sent by this station's address, with specified option (only used for DATA frames)
+    // Generates a frame of a specified type, destined for a receiver, sent by this station's address, with specified option (only used for DATA frames)
     generateFrame(type, receiver, option, id) {
         var generatedFrame = new frame(type, receiver, this.address, option, id);
         return generatedFrame;
@@ -307,91 +333,91 @@ class station {
         }
     }
 
-	//Randomly generates a backoff time in the range [0, 2^n - 1], where n is the number of
-	//collisions the current frame has encountered
+    //Randomly generates a backoff time in the range [0, 2^n - 1], where n is the number of
+    //collisions the current frame has encountered
     generateBackoff() {
-		let backOffTime = Math.floor(Math.random() * Math.pow(2,3+(this.numCollisions)));
-		backOffTime *= SLOT_TIME;
+        let backOffTime = Math.floor(Math.random() * Math.pow(2, 3 + (this.numCollisions)));
+        backOffTime *= SLOT_TIME;
         this.backoffTime = backOffTime;
     }
 
-	//Declares that this station is ready to send the frame in its outBuffer
+    //Declares that this station is ready to send the frame in its outBuffer
     setReadyToSend() {
         this.isReadyToSend = true;
     }
-	
-	//Returns 'true' if the station is finished transmitting, false if it is not
-	isFinishedTransmitting() {
-		if(this.isTransmitting && this.transmissionTime === 0) {
-			return true;
-		}
-		return false;
-	}
 
-	//Terminates the current transmission (this is called when the transmission timer = 0)
-	//Declares that the station is not transmitting, nullifies the transmissionTimer, sets the
-	//wait time to DIFS by default, nullifies the backoff timer, and removes the station's
-	//signal from the medium
+    //Returns 'true' if the station is finished transmitting, false if it is not
+    isFinishedTransmitting() {
+        if (this.isTransmitting && this.transmissionTime === 0) {
+            return true;
+        }
+        return false;
+    }
+
+    //Terminates the current transmission (this is called when the transmission timer = 0)
+    //Declares that the station is not transmitting, nullifies the transmissionTimer, sets the
+    //wait time to DIFS by default, nullifies the backoff timer, and removes the station's
+    //signal from the medium
     terminateTransmission() {
         this.isTransmitting = false;
         this.transmissionTime = null;
         this.waitTime = DIFS;
         this.backoffTime = null;
-		if(this.outBuffer.getType() != RTS && this.outBuffer.getType() != DATA) {
-			this.outBuffer = null;
-		}
-		if(this.isAccessPoint) {
-			for(var i = 0; i < NUM_SECTORS; i++) {
-				this.bss.medium.removeSignal(i);
-			}
-		} else {
-			this.bss.medium.removeSignal(this.physicalLocation);
-		}
+        if (this.outBuffer.getType() != RTS && this.outBuffer.getType() != DATA) {
+            this.outBuffer = null;
+        }
+        if (this.isAccessPoint) {
+            for (var i = 0; i < NUM_SECTORS; i++) {
+                this.bss.medium.removeSignal(i);
+            }
+        } else {
+            this.bss.medium.removeSignal(this.physicalLocation);
+        }
     }
 
-	//Returns the physical location (sector number) of the station
+    //Returns the physical location (sector number) of the station
     getPhysicalLocation() {
         return this.physicalLocation;
     }
-	
-	//Set physical location
-	setPhysicalLocation(l) {
-		this.physicalLocation = l;
-	}
 
-	//Returns the time left until the station detects a collision
+    //Set physical location
+    setPhysicalLocation(l) {
+        this.physicalLocation = l;
+    }
+
+    //Returns the time left until the station detects a collision
     getTimeToColllision() {
         return this.timeToCollision;
     }
 
-	//Sets the collision timer
+    //Sets the collision timer
     setTimeToCollision(t) {
         this.timeToCollision = t;
     }
-	
-	//Checks if the station is ready to send
-	readyCheck() {
-		if(this.outBuffer == null) {
-			this.loadNewDataFrame();		
-		}
-		if(this.waitTime == 0 && this.backoffTime == 0 && this.outBuffer != null) {
-			this.isReadyToSend = true;
-		}
-	}
-	
-	//Loads a new DATA frame
-	loadNewDataFrame() {
-		if(this.frames.length == 0) {
-			return null;		
-		}
-		let newDataFrame = this.frames.pop();
-		if(USE_RTS_CTS && newDataFrame.getLength() > RTS_CTS_THRESH) {
-			this.outBuffer = this.generateFrame(RTS, newDataFrame.getReceiver(), null, newDataFrame.getID());
-			this.frames.push(newDataFrame);
-		} else {
-			this.outBuffer = newDataFrame;
-		}
-	}
+
+    //Checks if the station is ready to send
+    readyCheck() {
+        if (this.outBuffer == null) {
+            this.loadNewDataFrame();
+        }
+        if (this.waitTime == 0 && this.backoffTime == 0 && this.outBuffer != null) {
+            this.isReadyToSend = true;
+        }
+    }
+
+    //Loads a new DATA frame
+    loadNewDataFrame() {
+        if (this.frames.length == 0) {
+            return null;
+        }
+        let newDataFrame = this.frames.pop();
+        if (USE_RTS_CTS && newDataFrame.getLength() > RTS_CTS_THRESH) {
+            this.outBuffer = this.generateFrame(RTS, newDataFrame.getReceiver(), null, newDataFrame.getID());
+            this.frames.push(newDataFrame);
+        } else {
+            this.outBuffer = newDataFrame;
+        }
+    }
 
 }
 
@@ -421,16 +447,16 @@ class medium {
     }
 
     isQuiet(sector) {
-		if(sector == AP_LOC) {
-			for(var i = 0; i < NUM_SECTORS; i++) {
-				if(this.sectors[i] > 0) {
-					return false;
-				}
-				else {
-					return true;
-				}
-			}
-		}
+        if (sector == AP_LOC) {
+            for (var i = 0; i < NUM_SECTORS; i++) {
+                if (this.sectors[i] > 0) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+        }
         else if (this.sectors[sector] > 0) {
             return false;
         }
@@ -438,14 +464,14 @@ class medium {
             return true;
         }
     }
-	
-	addSignal(physicalLocation) {
-		this.sectors[physicalLocation]++;
-	}
-	
-	removeSignal(physicalLocation) {
-		this.sectors[physicalLocation]--;
-	}
+
+    addSignal(physicalLocation) {
+        this.sectors[physicalLocation]++;
+    }
+
+    removeSignal(physicalLocation) {
+        this.sectors[physicalLocation]--;
+    }
 }
 
 
@@ -472,9 +498,9 @@ class basicServiceSet {
             else if (this.stations[i].physicalLocation == location && !this.stations[i].isTransmitting) {
                 this.stations[i].setNav(newNav);
             }
-			else if (this.stations[i].isAccessPoint && !this.stations[i].isTransmitting) {
-				this.stations[i].setNav(newNav);
-			}
+            else if (this.stations[i].isAccessPoint && !this.stations[i].isTransmitting) {
+                this.stations[i].setNav(newNav);
+            }
         }
     }
 
