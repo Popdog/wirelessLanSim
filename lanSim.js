@@ -55,8 +55,17 @@ function collisionDetected(station) {
     station.timeToCollision = null;
 }
 
+function changeOutputText() {
+    document.getElementById("outputText").innerHTML = "running simulation...";
+}
+
+
 function main() {
-    getVariables();
+    if(!getVariables()) {
+        document.getElementById("outputText").innerHTML = "Simulation Failed :(";
+        return;
+    }
+    
     //Stores the average amount of time for the simulation to finish, in microseconds.
     var averageTfin = 0;
     //The user can specify how many times to run the simulation

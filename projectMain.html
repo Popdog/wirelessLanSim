@@ -25,10 +25,24 @@
             </div>
             <div class="col-3">
                 <form>
-                    <input type="text" value="20" class="dataEntryBox" id="dataSizeBox" /> (Bytes)
-                    <input type="text" value="No" class="dataEntryBox" id="useRtsCtsBox" /> (Yes/No)
-                    <input type="text" value="No" class="dataEntryBox" id="useHiddenNodesBox" /> (Yes/No)
-                    <button type="button" onclick="main()" class="startButton">Start!</button>
+                    <input type="text" value="20" class="dataEntryBox" id="dataSizeBox" /> (1 - 2312)
+                    <div class="dataEntryBox">
+                      <input type="radio" id="useRtsCtsYes"
+                       name="useRtsCts" value="yes">
+                      <label for="useRtsCtsYes">Yes</label>
+                      <input type="radio" id="useRtsCtsNo"
+                       name="useRtsCts" value="no" checked>
+                      <label for="useRtsCtsNo">No</label>
+                    </div>
+                    <div class="dataEntryBox">
+                        <input type="radio" id="useHiddenNodesYes"
+                         name="useHiddenNodes" value="yes">
+                        <label for="useHiddenNodesYes">Yes</label>
+                        <input type="radio" id="useHiddenNodesNo"
+                         name="useHiddenNodes" value="no" checked>
+                        <label for="useHiddenNodesNo">No</label>
+                      </div>
+                    <button type="button" onclick="changeOutputText();main()" id="startButton" class="startButton">Start!</button>
                 </form>
             </div>
             <div class="col-6">

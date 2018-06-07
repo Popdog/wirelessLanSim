@@ -1,29 +1,23 @@
 /* William Myers, CNT 5008, Fall 17 */
-var DATA_SIZE_IN_BYTES = 100; //Integer in the interval [1, 2312]
-var USE_RTS_CTS = true;
-var USE_HIDDEN_NODES = true;
+var DATA_SIZE_IN_BYTES = 20; //Integer in the interval [1, 2312]
+var USE_RTS_CTS = false;
+var USE_HIDDEN_NODES = false;
 
 function getVariables() {
-
     DATA_SIZE_IN_BYTES = document.getElementById("dataSizeBox").value;
-    if (document.getElementById("useRtsCtsBox").value == "Yes" || document.getElementById("useRtsCtsBox").value == "yes") {
+    if (document.getElementById("useRtsCtsYes").checked) {
         USE_RTS_CTS = true;
-    } else if (document.getElementById("useRtsCtsBox").value == "No" || document.getElementById("useRtsCtsBox").value == "no") {
+    } else {
         USE_RTS_CTS = false;
     }
-    else {
-        document.getElementById("useRtsCtsBox").value = "Invalid Input";
-
-    }
-    if (document.getElementById("useHiddenNodesBox").value == "Yes" || document.getElementById("useHiddenNodesBox").value == "yes") {
+    if (document.getElementById("useHiddenNodesYes").checked) {
         USE_HIDDEN_NODES = true;
-    } else if (document.getElementById("useHiddenNodesBox").value == "No" || document.getElementById("useHiddenNodesBox").value == "no") {
+    } else {
         USE_HIDDEN_NODES = false;
     }
-    else {
-        document.getElementById("useRtsCtsBox").value = "Invalid Input";
-    }
+    document.getElementById("outputText").innerHTML = "running simulation...";
     updateConstants();
+    return true;
 }
 
 var NUM_STATIONS = 4;
